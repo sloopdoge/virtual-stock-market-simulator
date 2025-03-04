@@ -1,7 +1,6 @@
 ﻿using API.Domain.Entities;
 using API.Domain.Models;
 using API.Identity.Entities;
-using API.Identity.Repositories;
 using API.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

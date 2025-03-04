@@ -7,6 +7,7 @@ using API.Identity.Services;
 using API.Infrastructure.Interfaces;
 using API.Infrastructure.Services;
 using API.Infrastructure.Utils;
+using API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -140,6 +141,8 @@ public class Program
             #region Services
             
             builder.Services.AddHostedService<DatabaseInitializer>();
+            
+            builder.Services.AddScoped<ICompanyService, CompanyService>();
 
             #endregion
 
@@ -149,6 +152,8 @@ public class Program
             
             builder.Services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(defaultConnectionString));
+
+            builder.Services.AddScoped<CompanyDbRepository>();
 
             #endregion
             
