@@ -1,4 +1,6 @@
-﻿namespace API.Identity.Models;
+﻿using API.Identity.Models;
+
+namespace API.Domain.Models;
 
 public class AuthModel
 {

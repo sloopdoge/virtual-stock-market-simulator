@@ -1,6 +1,18 @@
+using System.Text;
 using API.App.SwaggerConfig;
+using API.Identity.Entities;
+using API.Identity.Interfaces;
+using API.Identity.Repositories;
+using API.Identity.Services;
+using API.Infrastructure.Interfaces;
+using API.Infrastructure.Services;
+using API.Infrastructure.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
@@ -51,10 +63,92 @@ public class Program
 
         try
         {
+            #region Identity
 
-            #region Services
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            var secretKey = jwtSettings.GetValue<string>("SecretKey");
+
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
+                        ValidAudience = jwtSettings.GetValue<string>("Audience"),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    };
+    
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/hubs")))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        },
+                        OnChallenge = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            Log.Information("Access Token: {accessToken}", accessToken);
+                            return Task.CompletedTask;
+                        },
+                        OnAuthenticationFailed = context =>
+                        {
+                            Log.Error("Authentication failed: {Exception}", context.Exception);
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            Log.Information("Token validated successfully for user: {ConnectionId}", context.HttpContext.Connection.Id);
+                            return Task.CompletedTask;
+                        },
+                    };
+                    
+                    options.IncludeErrorDetails = true;
+                });
+
+            builder.Services.AddIdentityCore<ApplicationUser>()
+                .AddRoles<ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
 
             builder.Services.AddAuthorization();
+
+            #endregion
+
+            #region Services
+            
+            builder.Services.AddHostedService<DatabaseInitializer>();
+
+            #endregion
+
+            #region DataBase
+
+            var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            
+            builder.Services.AddDbContext<ApplicationDbContext>(options => 
+                options.UseSqlServer(defaultConnectionString));
 
             #endregion
             
@@ -96,22 +190,25 @@ public class Program
             #endregion
 
             builder.Services.AddControllers();
-            
-            builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(@"/var/www/dataprotection-keys"))
-                .SetApplicationName("api.vsms");
-            builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
             builder.Services.AddCors(options =>
                 {
-                    options.AddDefaultPolicy(option =>
+                    options.AddDefaultPolicy(policy =>
                         {
-                            option.AllowAnyOrigin()
+                            policy.AllowAnyOrigin()
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
                         }
                     );
                 }
             );
+            builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddSignalR();
+            
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(@"/var/www/dataprotection-keys"))
+                .SetApplicationName("api.vsms");
+            builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 
             var app = builder.Build();
 
