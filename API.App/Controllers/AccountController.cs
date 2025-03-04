@@ -108,6 +108,7 @@ public class AccountController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status418ImATeapot)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] UserRegisterModel model)
@@ -121,7 +122,7 @@ public class AccountController(
             var role = await roleService.GetById(model.Role.Id);
 
             if (role == null || string.IsNullOrEmpty(role.Name))
-                return BadRequest($"User role not found");
+                return NotFound($"User role not found");
 
             var createdUser = await userService.Create(new AppUser(model));
             if (createdUser == null)
