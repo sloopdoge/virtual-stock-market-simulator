@@ -1,0 +1,8 @@
+﻿/obj/
+/bin/
+/.idea/
+/API.Domain/obj/
+/API.Identity/obj/
+/API.Infrastructure/obj/
+/API.Repository/obj/
+/API.App/obj/

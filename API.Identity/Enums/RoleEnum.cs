@@ -1,6 +1,6 @@
 ﻿namespace API.Identity.Enums;
 
-public enum Roles
+public enum RoleEnum
 {
     Guest = 0, 
     User = 1,

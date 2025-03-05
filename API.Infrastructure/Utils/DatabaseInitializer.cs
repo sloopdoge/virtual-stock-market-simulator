@@ -1,5 +1,6 @@
 ﻿using API.Identity.Entities;
 using API.Identity.Enums;
+using API.Identity.Structures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,10 +35,10 @@ public class DatabaseInitializer(ILogger<DatabaseInitializer> logger, IServicePr
             
             List<string> defaultRoles =
             [
-                Roles.Guest.ToString(),
-                Roles.User.ToString(),
-                Roles.Admin.ToString(),
-                Roles.ApiUser.ToString(),
+                RoleNames.Admin,
+                RoleNames.User,
+                RoleNames.Admin,
+                RoleNames.ApiUser,
             ];
             
             using var scope = serviceProvider.CreateScope();
@@ -78,11 +79,11 @@ public class DatabaseInitializer(ILogger<DatabaseInitializer> logger, IServicePr
             var defaultUser = new ApplicationUser()
             {
                 Id = Guid.Parse("0656AE1D-2662-48CE-A3EF-693C3BD3CCB5"),
-                FirstName = $"{Roles.Admin.ToString()}",
-                LastName = $"{Roles.Admin.ToString()}",
+                FirstName = $"{RoleNames.Admin}",
+                LastName = $"{RoleNames.Admin}",
                 BirthDate = DateTime.UtcNow.AddYears(-20),
-                Email = $"{Roles.Admin.ToString().ToLower()}@{Roles.Admin.ToString().ToLower()}.com",
-                UserName = $"{Roles.Admin.ToString().ToLower()}",
+                Email = $"{RoleNames.Admin.ToLower()}@{RoleNames.Admin.ToLower()}.com",
+                UserName = $"{RoleNames.Admin.ToLower()}",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
             };
@@ -95,7 +96,7 @@ public class DatabaseInitializer(ILogger<DatabaseInitializer> logger, IServicePr
 
                 await userManager.CreateAsync(defaultUser, defaultPassword);
                 
-                await userManager.AddToRoleAsync(defaultUser, Roles.Admin.ToString());
+                await userManager.AddToRoleAsync(defaultUser, RoleNames.Admin);
             }
             
             logger.LogInformation("--- Finished initializing default user ---");

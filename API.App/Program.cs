@@ -5,6 +5,7 @@ using API.Identity.Enums;
 using API.Identity.Interfaces;
 using API.Identity.Repositories;
 using API.Identity.Services;
+using API.Identity.Structures;
 using API.Infrastructure.Hubs;
 using API.Infrastructure.Hubs.Interfaces;
 using API.Infrastructure.Hubs.Services;
@@ -142,7 +143,7 @@ public class Program
             {
                 options.AddPolicy("AdminPermissions", policy =>
                 {
-                    policy.RequireRole(Roles.Admin.ToString());
+                    policy.RequireRole(RoleNames.Admin);
                 });
             });
 
