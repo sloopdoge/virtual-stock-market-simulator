@@ -1,7 +1,6 @@
 using System.Text;
 using API.App.SwaggerConfig;
 using API.Identity.Entities;
-using API.Identity.Enums;
 using API.Identity.Interfaces;
 using API.Identity.Repositories;
 using API.Identity.Services;
@@ -10,7 +9,10 @@ using API.Infrastructure.Hubs;
 using API.Infrastructure.Hubs.Interfaces;
 using API.Infrastructure.Hubs.Services;
 using API.Infrastructure.Interfaces;
+using API.Infrastructure.Interfaces.Algorithms;
 using API.Infrastructure.Services;
+using API.Infrastructure.Services.Algorithms;
+using API.Infrastructure.Services.Background;
 using API.Infrastructure.Utils;
 using API.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -152,9 +154,12 @@ public class Program
             #region Services
             
             builder.Services.AddHostedService<DatabaseInitializer>();
+            builder.Services.AddHostedService<StockMarketBackgroundService>();
             
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IStockService, StockService>();
+
+            builder.Services.AddTransient<IRandomWalkWithDriftAlgorithm, RandomWalkWithDriftAlgorithm>();
             
             builder.Services.AddSingleton<StocksHub>();
             

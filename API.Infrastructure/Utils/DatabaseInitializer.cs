@@ -1,5 +1,4 @@
 ﻿using API.Identity.Entities;
-using API.Identity.Enums;
 using API.Identity.Structures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

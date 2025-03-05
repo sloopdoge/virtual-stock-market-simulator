@@ -34,7 +34,7 @@ public class StockDbRepository(IConfiguration configuration) : BaseDbRepository(
     public Task<Stock> Create(Stock model)
     {
         var obj = new DynamicParameters();
-        obj.Add("@Id", model.Id);
+        obj.Add("@Symbol", model.Symbol);
         obj.Add("@Name", model.Name);
         obj.Add("@Price", model.Price);
         obj.Add("@CompanyId", model.CompanyId);
@@ -47,6 +47,7 @@ public class StockDbRepository(IConfiguration configuration) : BaseDbRepository(
     {
         var obj = new DynamicParameters();
         obj.Add("@Id", model.Id);
+        obj.Add("@Symbol", model.Symbol);
         obj.Add("@Name", model.Name);
         obj.Add("@Price", model.Price);
         obj.Add("@CompanyId", model.CompanyId);

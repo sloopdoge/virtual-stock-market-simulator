@@ -53,6 +53,8 @@ public class StockService(
     {
         try
         {
+            stock.CreatedAt = DateTime.UtcNow;
+            
             return await stockDbRepository.Create(stock);
         }
         catch (Exception e)

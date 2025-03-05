@@ -49,7 +49,7 @@ public class StockController(
     {
         try
         {
-            if (stock is null || stock.IsValid())
+            if (stock is null || !stock.IsValid())
                 return BadRequest("Stock model is invalid");
             
             var createRes = await stockService.Create(stock);
