@@ -6,7 +6,21 @@ public class Stock
     public string Symbol { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public DateTime LastUpdate { get; set; }
     
     public Guid CompanyId { get; set; }
+
+    public bool IsValid()
+    {
+        if (string.IsNullOrEmpty(Symbol))
+            return false;
+        if (string.IsNullOrEmpty(Name))
+            return false;
+        if (Price < 0)
+            return false;
+        
+        return true;
+    }
 }

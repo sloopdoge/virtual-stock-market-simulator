@@ -42,6 +42,9 @@ public class CompanyService(
         {
             var newGuid = Guid.NewGuid();
             company.Id = newGuid;
+            company.CreatedAt = DateTime.UtcNow;
+            company.UpdatedAt = DateTime.UtcNow;
+            
             var res = await companyDbRepository.Create(company);
             
             return res
@@ -59,7 +62,13 @@ public class CompanyService(
     {
         try
         {
-            throw new NotImplementedException();
+            company.UpdatedAt = DateTime.UtcNow;
+            
+            var res = await companyDbRepository.Update(company);
+            
+            return res
+                ? await GetById(company.Id)
+                : null;
         }
         catch (Exception e)
         {
@@ -72,7 +81,7 @@ public class CompanyService(
     {
         try
         {
-            throw new NotImplementedException();
+            return await companyDbRepository.Delete(companyId);
         }
         catch (Exception e)
         {
@@ -85,7 +94,7 @@ public class CompanyService(
     {
         try
         {
-            throw new NotImplementedException();
+            return await companyDbRepository.IsExist(companyId);
         }
         catch (Exception e)
         {

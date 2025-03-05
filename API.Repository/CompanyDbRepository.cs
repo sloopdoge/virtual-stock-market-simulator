@@ -11,14 +11,14 @@ public class CompanyDbRepository(IConfiguration configuration) : BaseDbRepositor
         var obj = new DynamicParameters();
         obj.Add("@Id", companyId);
         
-        return Get<Company>("GetById", obj);
+        return ExecuteQueryWithSingleReturn<Company>("GetById", obj);
     }
 
     public Task<List<Company>> GetAll()
     {
         var obj = new DynamicParameters();
         
-        return GetMany<Company>("GetAll");
+        return ExecuteQueryWithListReturn<Company>("GetAll");
     }
 
     public Task<bool> IsExist(Guid companyId)
@@ -51,5 +51,13 @@ public class CompanyDbRepository(IConfiguration configuration) : BaseDbRepositor
         obj.Add("@CreatedAt", model.CreatedAt);
         
         return ExecuteQuery(obj, "Update");
+    }
+
+    public Task<bool> Delete(Guid companyId)
+    {
+        var obj = new DynamicParameters();
+        obj.Add("@Id", companyId);
+        
+        return ExecuteQuery(obj, "Delete");
     }
 }

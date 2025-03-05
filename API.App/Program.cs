@@ -1,9 +1,13 @@
 using System.Text;
 using API.App.SwaggerConfig;
 using API.Identity.Entities;
+using API.Identity.Enums;
 using API.Identity.Interfaces;
 using API.Identity.Repositories;
 using API.Identity.Services;
+using API.Infrastructure.Hubs;
+using API.Infrastructure.Hubs.Interfaces;
+using API.Infrastructure.Hubs.Services;
 using API.Infrastructure.Interfaces;
 using API.Infrastructure.Services;
 using API.Infrastructure.Utils;
@@ -134,7 +138,13 @@ public class Program
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPermissions", policy =>
+                {
+                    policy.RequireRole(Roles.Admin.ToString());
+                });
+            });
 
             #endregion
 
@@ -143,6 +153,11 @@ public class Program
             builder.Services.AddHostedService<DatabaseInitializer>();
             
             builder.Services.AddScoped<ICompanyService, CompanyService>();
+            builder.Services.AddScoped<IStockService, StockService>();
+            
+            builder.Services.AddSingleton<StocksHub>();
+            
+            builder.Services.AddScoped<IStocksRealTimeHub, StocksRealTimeHub>();
 
             #endregion
 
@@ -154,6 +169,7 @@ public class Program
                 options.UseSqlServer(defaultConnectionString));
 
             builder.Services.AddScoped<CompanyDbRepository>();
+            builder.Services.AddScoped<StockDbRepository>();
 
             #endregion
             
@@ -242,17 +258,18 @@ public class Program
             });
             app.UseAuthorization();
 
+
 #pragma warning disable ASP0014
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                // endpoints.MapHub<WebUIHub>("/WebUIHub", options =>
-                // {
-                //     options.TransportMaxBufferSize = 456000;
-                //     options.ApplicationMaxBufferSize = 456000;
-                //     options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(15);
-                //     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(15);
-                // });
+                endpoints.MapHub<StocksHub>("/StocksHub", options =>
+                {
+                    options.TransportMaxBufferSize = 456000;
+                    options.ApplicationMaxBufferSize = 456000;
+                    options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(15);
+                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(15);
+                });
             });
 #pragma warning restore ASP0014
 

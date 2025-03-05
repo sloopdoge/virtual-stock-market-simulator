@@ -73,6 +73,7 @@
     <Build Include="StoredProcedures\Stocks\sp_Stocks_GetAll.sql" />
     <Build Include="StoredProcedures\Stocks\sp_Stocks_Create.sql" />
     <Build Include="StoredProcedures\Stocks\sp_Stocks_Update.sql" />
+    <Build Include="StoredProcedures\Stocks\sp_Stocks_Delete.sql" />
     <Build Include="StoredProcedures\Companies\sp_Companies_Update.sql" />
   </ItemGroup>
 </Project>

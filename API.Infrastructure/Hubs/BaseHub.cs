@@ -14,10 +14,9 @@ public class BaseHub : Hub
     {
         return GetClaimValue(ClaimTypes.NameIdentifier);
     }
-    
-    private string? GetClaimValue(string claimType)
+
+    protected string? GetClaimValue(string claimType)
     {
-        var claim = Context.User?.Claims.FirstOrDefault(c => c.Type == claimType);
-        return claim?.Value;
+        return Context.User?.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
     }
 }

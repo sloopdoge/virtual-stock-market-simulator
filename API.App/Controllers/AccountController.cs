@@ -11,13 +11,14 @@ using Microsoft.EntityFrameworkCore;
 namespace API.App.Controllers;
 
 [ApiController]
-[Route($"api/v1/[controller]")]
+[Route($"api/[controller]")]
 public class AccountController(
     IUserService userService,
     IRoleService roleService,
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
-    IJwtTokenService jwtTokenService) : ControllerBase
+    IJwtTokenService jwtTokenService) 
+    : ControllerBase
 {
     [AllowAnonymous]
     [Produces("application/json")]

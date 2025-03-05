@@ -1,35 +1,90 @@
 ﻿using API.Domain.Entities;
 using API.Infrastructure.Interfaces;
+using API.Repository;
 using Microsoft.Extensions.Logging;
 
 namespace API.Infrastructure.Services;
 
 public class StockService(
-    ILogger<StockService> logger) 
+    ILogger<StockService> logger,
+    StockDbRepository stockDbRepository) 
     : IStockService
 {
     public async Task<Stock?> GetById(long stockId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await stockDbRepository.GetById(stockId);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
+    }
+
+    public async Task<List<Stock>> GetHistoryById(long stockId, DateTime startDate, DateTime endDate = default)
+    {
+        try
+        {
+            return await stockDbRepository.GetHistoryById(stockId, startDate, endDate);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return [];
+        }
     }
 
     public async Task<List<Stock>> GetAll()
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await stockDbRepository.GetAll();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return [];
+        }
     }
 
     public async Task<Stock?> Create(Stock stock)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await stockDbRepository.Create(stock);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
     }
 
     public async Task<Stock?> Update(Stock stock)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await stockDbRepository.Update(stock);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
     }
 
-    public async Task<bool> Delete(Guid stockId)
+    public async Task<bool> Delete(long stockId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await stockDbRepository.Delete(stockId);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return false;
+        }
     }
 }

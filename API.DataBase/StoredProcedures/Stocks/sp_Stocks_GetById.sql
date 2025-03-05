@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_Stocks_GetById] @Id DECIMAL
+﻿CREATE PROCEDURE [dbo].[sp_Stocks_GetById] @Id INT
 AS
 BEGIN
     SELECT S.[Id],

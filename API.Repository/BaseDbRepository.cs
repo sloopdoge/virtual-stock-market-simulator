@@ -52,7 +52,7 @@ public class BaseDbRepository
         }
     }
     
-    protected async Task<List<TModel>> GetMany<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null) where TModel : class
+    protected async Task<List<TModel>> ExecuteQueryWithListReturn<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null) where TModel : class
     {
         var storedProcedure = customName ? storedProcedureName : StoredProcedure(storedProcedureName);
 
@@ -69,7 +69,7 @@ public class BaseDbRepository
         }
     }
     
-    protected async Task<TModel> Get<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null)
+    protected async Task<TModel> ExecuteQueryWithSingleReturn<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null)
     {
         var storedProcedure = customName ? storedProcedureName : StoredProcedure(storedProcedureName);
 
@@ -86,7 +86,7 @@ public class BaseDbRepository
         }
     }
     
-    protected async Task<TModel> GetFromJson<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null)
+    protected async Task<TModel> ExecuteQueryWithSingleJsonReturn<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null)
     {
         var storedProcedure = customName ? storedProcedureName : StoredProcedure(storedProcedureName);
         
@@ -115,7 +115,7 @@ public class BaseDbRepository
         }
     }
 
-    protected async Task<List<TModel>> GetManyFromJson<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null)
+    protected async Task<List<TModel>> ExecuteQueryWithListJsonReturn<TModel>(string storedProcedureName, DynamicParameters? parameters = null, bool customName = false, SqlTransaction? transaction = null)
     {
         var storedProcedure = customName ? storedProcedureName : StoredProcedure(storedProcedureName);
 
