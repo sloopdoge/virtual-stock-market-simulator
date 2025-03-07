@@ -2,6 +2,7 @@
 using API.Domain.Models;
 using API.Identity.Entities;
 using API.Infrastructure.Interfaces;
+using API.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,8 @@ namespace API.Infrastructure.Services;
 public class UserService(
     ILogger<UserService> logger,
     UserManager<ApplicationUser> userManager,
-    RoleManager<ApplicationRole> roleManager)
+    RoleManager<ApplicationRole> roleManager,
+    UserProfilesDbRepository userProfilesDbRepository)
     : IUserService
 {
     public async Task<ApplicationUser?> GetById(Guid userId)
@@ -300,6 +302,51 @@ public class UserService(
         {
             logger.LogError(e, e.Message);
             return [];
+        }
+    }
+
+    public async Task<UserProfile?> GetUserProfileById(Guid userId)
+    {
+        try
+        {
+            var res = await userProfilesDbRepository.GetById(userId);
+
+            return res;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
+    }
+
+    public async Task<UserProfile?> CreateUserProfile(UserProfile profile)
+    {
+        try
+        {
+            var res = await userProfilesDbRepository.Create(profile);
+
+            return res;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
+    }
+
+    public async Task<UserProfile?> UpdateUserProfile(UserProfile profile)
+    {
+        try
+        {
+            var res = await userProfilesDbRepository.Update(profile);
+
+            return res;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
         }
     }
 }

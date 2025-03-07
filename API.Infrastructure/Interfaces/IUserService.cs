@@ -1,4 +1,5 @@
-﻿using API.Identity.Entities;
+﻿using API.Domain.Entities;
+using API.Identity.Entities;
 
 namespace API.Infrastructure.Interfaces;
 
@@ -16,4 +17,8 @@ public interface IUserService
     
     Task<List<ApplicationUser>> GetAllModels();
     Task<List<ApplicationUser>> GetAllInRole(string roleName);
+    
+    Task<UserProfile?> GetUserProfileById(Guid userId);
+    Task<UserProfile?> CreateUserProfile(UserProfile profile);
+    Task<UserProfile?> UpdateUserProfile(UserProfile profile);
 }

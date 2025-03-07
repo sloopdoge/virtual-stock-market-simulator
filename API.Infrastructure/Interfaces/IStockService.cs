@@ -13,4 +13,5 @@ public interface IStockService
     Task<bool> UpdateMany(List<Stock> updatedStocks);
     Task<bool> UpdatePriceById(Stock stock);
     Task<bool> UpdatePriceForMany(List<Stock> stocks);
+    Task<List<UserStock>> GetStocksByUserId(Guid userId);
 }

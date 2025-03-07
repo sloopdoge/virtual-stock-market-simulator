@@ -182,6 +182,7 @@ public class Program
 
             builder.Services.AddScoped<CompanyDbRepository>();
             builder.Services.AddScoped<StockDbRepository>();
+            builder.Services.AddScoped<UserProfilesDbRepository>();
 
             #endregion
             

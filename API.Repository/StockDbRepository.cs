@@ -90,4 +90,12 @@ public class StockDbRepository(IConfiguration configuration) : BaseDbRepository(
         
         return ExecuteQuery(obj, "UpdatePriceForMany");
     }
+
+    public Task<List<UserStock>> GetStocksByUserId(Guid userId)
+    {
+        var obj = new DynamicParameters();
+        obj.Add("@UserId", userId);
+        
+        return ExecuteQueryWithListReturn<UserStock>("GetStocksByUserId", obj);
+    }
 }

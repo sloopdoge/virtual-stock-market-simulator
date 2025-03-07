@@ -131,4 +131,17 @@ public class StockService(
             return false;
         }
     }
+
+    public async Task<List<UserStock>> GetStocksByUserId(Guid userId)
+    {
+        try
+        {
+            return await stockDbRepository.GetStocksByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return [];
+        }
+    }
 }
