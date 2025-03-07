@@ -9,7 +9,6 @@ using API.Infrastructure.Hubs;
 using API.Infrastructure.Hubs.Interfaces;
 using API.Infrastructure.Hubs.Services;
 using API.Infrastructure.Interfaces;
-using API.Infrastructure.Interfaces.Algorithms;
 using API.Infrastructure.Services;
 using API.Infrastructure.Services.Algorithms;
 using API.Infrastructure.Services.Background;
@@ -153,13 +152,20 @@ public class Program
 
             #region Services
             
+            builder.Services.AddLogging();
+            
             builder.Services.AddHostedService<DatabaseInitializer>();
             builder.Services.AddHostedService<StockMarketBackgroundService>();
             
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IStockService, StockService>();
-
-            builder.Services.AddTransient<IRandomWalkWithDriftAlgorithm, RandomWalkWithDriftAlgorithm>();
+            
+            builder.Services.AddTransient<RandomWalkWithDriftAlgorithm>();
+            builder.Services.AddTransient<MeanReversionAlgorithm>();
+            builder.Services.AddTransient<MomentumAlgorithm>();
+            builder.Services.AddTransient<ExponentialMovingAverageAlgorithm>();
+            
+            builder.Services.AddScoped<IAlgorithmFactory, AlgorithmFactory>();
             
             builder.Services.AddSingleton<StocksHub>();
             

@@ -1,5 +1,5 @@
-﻿using API.Domain.Enums;
-using API.Infrastructure.Interfaces;
+﻿using API.Domain.Entities;
+using API.Domain.Enums;
 using API.Infrastructure.Interfaces.Algorithms;
 using Microsoft.Extensions.Logging;
 
@@ -7,15 +7,15 @@ namespace API.Infrastructure.Services.Algorithms;
 
 public class RandomWalkWithDriftAlgorithm(
     ILogger<RandomWalkWithDriftAlgorithm> logger) 
-    : IRandomWalkWithDriftAlgorithm
+    : IAlgorithm
 {
     private static readonly Random Random = new();
 
-    public decimal PredictPrice(decimal currentPrice)
+    public Task<Stock> PredictPrice(Stock stock)
     {
         try
         {
-            var trend = GetRandomTrend(); // Get a random market trend
+            var trend = GetRandomTrend();
 
             decimal marketDrift;
             decimal volatility;
@@ -23,33 +23,29 @@ public class RandomWalkWithDriftAlgorithm(
             switch (trend)
             {
                 case StockTrendEnum.Bullish:
-                    marketDrift = (decimal)Random.NextDouble() * 0.01m;  // 0% to 1% positive drift
-                    volatility = (decimal)Random.NextDouble() * 0.02m;   // 0% to 2% fluctuation
+                    marketDrift = (decimal)Random.NextDouble() * 0.005m;
+                    volatility = (decimal)Random.NextDouble() * 0.015m;
                     break;
-
                 case StockTrendEnum.Bearish:
-                    marketDrift = (decimal)-Random.NextDouble() * 0.01m; // -1% to 0% drift
-                    volatility = (decimal)Random.NextDouble() * 0.03m;   // 0% to 3% fluctuation
+                    marketDrift = (decimal)-Random.NextDouble() * 0.005m;
+                    volatility = (decimal)Random.NextDouble() * 0.02m;
                     break;
-
                 case StockTrendEnum.Volatile:
-                    marketDrift = 0;                                     // No clear trend
-                    volatility = (decimal)Random.NextDouble() * 0.05m;   // 0% to 5% high fluctuation
-                    break;
-
-                default: // Neutral
                     marketDrift = 0;
-                    volatility = (decimal)Random.NextDouble() * 0.01m;   // 0% to 1% fluctuation
+                    volatility = (decimal)Random.NextDouble() * 0.03m;
+                    break;
+                default:
+                    marketDrift = 0;
+                    volatility = (decimal)Random.NextDouble() * 0.01m;
                     break;
             }
 
-            var randomFactor = (2 * Random.NextDouble() - 1); // -1 to +1
+            var randomFactor = (decimal)(2 * Random.NextDouble() - 1);
+            var changeFactor = marketDrift + volatility * randomFactor;
 
-            var changeFactor = marketDrift + volatility * (decimal)randomFactor;
-            var newPrice = Math.Round(currentPrice * (1 + changeFactor), 2);
+            stock.Price = Math.Max(0.01m, Math.Round(stock.Price * (1 + changeFactor), 2));
 
-            logger.LogInformation($"Trend: {trend}, Change: {changeFactor:P}, New Price: {newPrice}");
-            return newPrice;
+            return Task.FromResult(stock);
         }
         catch (Exception e)
         {
@@ -60,7 +56,7 @@ public class RandomWalkWithDriftAlgorithm(
 
     private static StockTrendEnum GetRandomTrend()
     {
-        var values = Enum.GetValues<StockAlgorithmTypeEnum>();
+        var values = Enum.GetValues<StockTrendEnum>();
         return (StockTrendEnum)values.GetValue(Random.Next(values.Length))!;
     }
 }

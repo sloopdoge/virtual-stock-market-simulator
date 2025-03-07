@@ -1,6 +1,7 @@
 ﻿using API.Domain.Entities;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace API.Repository;
 
@@ -19,7 +20,7 @@ public class StockDbRepository(IConfiguration configuration) : BaseDbRepository(
         var obj = new DynamicParameters();
         obj.Add("@Id", stockId);
         obj.Add("@StartDate", startDate);
-        if (endDate.HasValue) obj.Add("@EndDate", endDate.Value);
+        obj.Add("@EndDate", endDate ?? DateTime.UtcNow);
 
         return ExecuteQueryWithListReturn<Stock>("GetHistoryById", obj);
     }
@@ -61,5 +62,32 @@ public class StockDbRepository(IConfiguration configuration) : BaseDbRepository(
         obj.Add("@Id", stockId);
         
         return ExecuteQuery(obj, "Delete");
+    }
+
+    public Task<bool> UpdateMany(List<Stock> updatedStocks)
+    {
+        var obj = new DynamicParameters();
+        var json = JsonConvert.SerializeObject(updatedStocks);
+        obj.Add("@Stocks", json);
+        
+        return ExecuteQuery(obj, "UpdateMany");
+    }
+
+    public Task<bool> UpdatePriceById(Stock stock)
+    {
+        var obj = new DynamicParameters();
+        obj.Add("@Id", stock.Id);
+        obj.Add("@Price", stock.Price);
+        
+        return ExecuteQuery(obj, "UpdatePriceById");
+    }
+
+    public Task<bool> UpdatePriceForMany(List<Stock> stocks)
+    {
+        var obj = new DynamicParameters();
+        var json = JsonConvert.SerializeObject(stocks);
+        obj.Add("@Stocks", json);
+        
+        return ExecuteQuery(obj, "UpdatePriceForMany");
     }
 }

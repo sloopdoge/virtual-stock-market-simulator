@@ -42,13 +42,13 @@ public class BaseDbRepository
         if (transaction != null)
         {
             var rows = await transaction.Connection.ExecuteAsync(storedProcedure, parameters, transaction: transaction, commandType: CommandType.StoredProcedure);
-            return rows > 0;
+            return rows != 0;
         }
 
         using (var connection = await GetConnectionAsync())
         {
             var rows = await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-            return rows > 0;
+            return rows != 0;
         }
     }
     

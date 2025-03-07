@@ -9,4 +9,5 @@ BEGIN
            S.[CreatedAt],
            S.[UpdatedAt]
     FROM [dbo].[Stocks] S
+    ORDER BY S.[UpdatedAt]
 END

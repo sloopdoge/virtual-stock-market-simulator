@@ -23,7 +23,7 @@ public class StockService(
         }
     }
 
-    public async Task<List<Stock>> GetHistoryById(long stockId, DateTime startDate, DateTime endDate = default)
+    public async Task<List<Stock>> GetHistoryById(long stockId, DateTime startDate, DateTime? endDate = null)
     {
         try
         {
@@ -82,6 +82,48 @@ public class StockService(
         try
         {
             return await stockDbRepository.Delete(stockId);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateMany(List<Stock> stocks)
+    {
+        try
+        {
+            if (stocks.Count == 0)
+                return false;
+            
+            return await stockDbRepository.UpdateMany(stocks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return false;
+        }
+    }
+    
+    public async Task<bool> UpdatePriceById(Stock stock)
+    {
+        try
+        {
+            return await stockDbRepository.UpdatePriceById(stock);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdatePriceForMany(List<Stock> stocks)
+    {
+        try
+        {
+            return await stockDbRepository.UpdatePriceForMany(stocks);
         }
         catch (Exception e)
         {

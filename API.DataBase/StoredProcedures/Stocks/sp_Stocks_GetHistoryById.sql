@@ -1,13 +1,8 @@
 CREATE PROCEDURE [dbo].[sp_Stocks_GetHistoryById] @Id INT,
                                                   @StartDate DATETIME2,
-                                                  @EndDate DATETIME2 = NULL
+                                                  @EndDate DATETIME2
 AS
 BEGIN
-    IF @EndDate IS NULL
-        BEGIN
-           SET @EndDate = GETUTCDATE()
-        END
-
     SELECT SH.[Id],
            SH.[Symbol],
            SH.[Name],

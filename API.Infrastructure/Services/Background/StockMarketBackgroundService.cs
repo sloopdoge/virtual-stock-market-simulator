@@ -1,6 +1,6 @@
-﻿using API.Domain.Enums;
+﻿using API.Domain.Entities;
+using API.Domain.Enums;
 using API.Infrastructure.Interfaces;
-using API.Infrastructure.Interfaces.Algorithms;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,23 +16,31 @@ public class StockMarketBackgroundService(
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Delay(10_000, stoppingToken);
+        
         try
         {
             using var scope = serviceScopeFactory.CreateScope();
             var stockService = scope.ServiceProvider.GetRequiredService<IStockService>();
-
+            var algorithmFactory = scope.ServiceProvider.GetRequiredService<IAlgorithmFactory>();
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
                     logger.LogInformation("=== Starting Stock Market changes ===");
                     var stocks = await stockService.GetAll();
+                    var updatedStocks = new List<Stock>();
                     foreach (var stock in stocks)
                     {
-                        stock.Price = SimulatePriceChange(stock.Price);
-                        await stockService.Update(stock);
+                        var updatedStock = await SimulatePriceChange(stock, algorithmFactory);
+                        updatedStocks.Add(updatedStock);
                         logger.LogInformation($"Stock: {stock.Symbol} | New price: {stock.Price}");
                     }
+                    
+                    var res = await stockService.UpdatePriceForMany(updatedStocks);
+                    if (!res)
+                        logger.LogError($"There was error updating stocks values in database");
                 }
                 catch (Exception e)
                 {
@@ -51,32 +59,21 @@ public class StockMarketBackgroundService(
         }
     }
 
-    private decimal SimulatePriceChange(decimal stockPrice)
+    private async Task<Stock> SimulatePriceChange(Stock stock, IAlgorithmFactory algorithmFactory)
     {
-        var newStockPrice = stockPrice;
-        
         try
         {
-            var algorithmTypes = Enum.GetValues<StockAlgorithmTypeEnum>();
+            var algorithmType = (StockAlgorithmTypeEnum)Enum.GetValues<StockAlgorithmTypeEnum>()
+                .GetValue(Random.Next(Enum.GetValues<StockAlgorithmTypeEnum>().Length))!;
 
-            // switch ((StockAlgorithmTypeEnum)algorithmTypes.GetValue(Random.Next(algorithmTypes.Length))!)
-            switch (StockAlgorithmTypeEnum.RandomWalkWithDrift)
-            {
-                case StockAlgorithmTypeEnum.RandomWalkWithDrift:
-                {
-                    using var scope = serviceScopeFactory.CreateScope();
-                    var algorithmService = scope.ServiceProvider.GetRequiredService<IRandomWalkWithDriftAlgorithm>();
-
-                    newStockPrice = algorithmService.PredictPrice(stockPrice);
-                    break;
-                }
-            }
+            var algorithm = algorithmFactory.GetAlgorithm(algorithmType);
+            
+            return await algorithm.PredictPrice(stock);
         }
         catch (Exception e)
         {
             logger.LogError(e, e.Message);
+            return stock;
         }
-        
-        return newStockPrice;
     }
 }
