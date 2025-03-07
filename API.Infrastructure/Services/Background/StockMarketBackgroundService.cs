@@ -25,11 +25,13 @@ public class StockMarketBackgroundService(
             {
                 try
                 {
+                    logger.LogInformation("=== Starting Stock Market changes ===");
                     var stocks = await stockService.GetAll();
                     foreach (var stock in stocks)
                     {
                         stock.Price = SimulatePriceChange(stock.Price);
                         await stockService.Update(stock);
+                        logger.LogInformation($"Stock: {stock.Symbol} | New price: {stock.Price}");
                     }
                 }
                 catch (Exception e)
@@ -38,6 +40,7 @@ public class StockMarketBackgroundService(
                 }
                 finally
                 {
+                    logger.LogInformation("=== Finished Stock Market changes ===");
                     await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
                 }
             }

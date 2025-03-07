@@ -1,4 +1,5 @@
 ﻿using API.Domain.Entities;
+using API.Domain.Models;
 using API.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,14 +46,14 @@ public class StockController(
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost]
     [Authorize(Policy = "AdminPermissions")]
-    public async Task<IActionResult> CreateStock([FromBody] Stock? stock)
+    public async Task<IActionResult> CreateStock([FromBody] CreateStockModel? model)
     {
         try
         {
-            if (stock is null || !stock.IsValid())
-                return BadRequest("Stock model is invalid");
+            if (model is null || !model.IsValid())
+                return BadRequest($"{nameof(CreateStockModel)} is invalid");
             
-            var createRes = await stockService.Create(stock);
+            var createRes = await stockService.Create(new Stock(model));
             
             return createRes != null 
                 ? Ok(createRes) 
@@ -76,7 +77,7 @@ public class StockController(
         try
         {
             if (stock is null || !stock.IsValid() || stock.Id == 0)
-                return BadRequest("Stock model is invalid");
+                return BadRequest($"{nameof(Stock)} is invalid");
             
             var updateRes = await stockService.Update(stock);
             

@@ -1,17 +1,19 @@
-﻿CREATE PROCEDURE [dbo].[sp_Stocks_Create] @Id INT OUTPUT,
-                                          @Symbol NVARCHAR(50),
-                                          @Name NVARCHAR(255),
-                                          @Price DECIMAL,
-                                          @CompanyId UNIQUEIDENTIFIER,
-                                          @CreatedAt DATETIME2
+﻿CREATE PROCEDURE [dbo].[sp_Stocks_Create]
+    @Symbol NVARCHAR(50),
+    @Name NVARCHAR(255),
+    @Price DECIMAL(38, 10),
+    @CompanyId UNIQUEIDENTIFIER,
+    @CreatedAt DATETIME2
 AS
 BEGIN
-    SET NOCOUNT ON
+    SET NOCOUNT ON;
+
+    DECLARE @Id INT;
 
     INSERT INTO [dbo].[Stocks] ([Symbol], [Name], [Price], [CompanyId], [CreatedAt])
-    VALUES (@Symbol, @Name, @Price, @CompanyId, @CreatedAt)
+    VALUES (@Symbol, @Name, @Price, @CompanyId, @CreatedAt);
 
-    SET @Id = SCOPE_IDENTITY()
+    SET @Id = SCOPE_IDENTITY();
 
     SELECT S.[Id],
            S.[Symbol],
@@ -22,5 +24,5 @@ BEGIN
            S.[UpdatedAt],
            S.[LastUpdate]
     FROM [dbo].[Stocks] S
-    WHERE [Id] = @Id
-END
+    WHERE S.[Id] = @Id;
+END;

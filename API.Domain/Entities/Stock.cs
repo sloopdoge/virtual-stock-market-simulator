@@ -1,4 +1,6 @@
-﻿namespace API.Domain.Entities;
+﻿using API.Domain.Models;
+
+namespace API.Domain.Entities;
 
 public class Stock
 {
@@ -22,5 +24,15 @@ public class Stock
             return false;
         
         return true;
+    }
+
+    public Stock() { }
+
+    public Stock(CreateStockModel model)
+    {
+        Symbol = model.Symbol;
+        Name = model.Name;
+        Price = model.Price;
+        CompanyId = model.CompanyId;
     }
 }

@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[sp_Stocks_Update] @Id INT,
                                           @Symbol NVARCHAR(50),
                                           @Name NVARCHAR(255),
-                                          @Price DECIMAL,
+                                          @Price DECIMAL(38, 10),
                                           @CompanyId UNIQUEIDENTIFIER
 AS
 BEGIN
